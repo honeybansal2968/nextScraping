@@ -21,7 +21,7 @@ app.get('/api', (req, res) => {
 
 
 app.get('/scrape', async (req, res) => {
-    const url = 'https://www.reddit.com/';  // Default URL if no URL is provided in query
+    const url = 'https://www.reddit.com/search/?q=skin+care+ai';  // Default URL if no URL is provided in query
 
     try {
         const args = puppeteer.defaultArgs();
@@ -40,31 +40,51 @@ app.get('/scrape', async (req, res) => {
         await page.goto(url, {
             waitUntil: "networkidle0"
         });
-        await page.evaluate('window.scrollTo(0, document.body.scrollHeight)')
-        const selector = 'shreddit-app'
+        // await page.evaluate('window.scrollTo(0, document.body.scrollHeight)')
+        const selector = 'a[data-testid="post-title"]';
         // var html = await page.title();
-        await page.waitForSelector(selector, { visible: true, hidden: true, timeout: 5000 });
         // Remove scripts and html imports. They've already executed.
-        await page.evaluate(() => {
-            const elements = document.querySelectorAll('script, link[rel="import"]');
-            elements.forEach(e => e.remove());
-        });
+        // await page.evaluate(() => {
+        //     const elements = document.querySelectorAll('script, link[rel="import"]');
+        //     elements.forEach(e => e.remove());
+        // });
 
-        const html = await page.$eval('html', (element) => {
-            return element.innerHTML;
-        });
-        // print length of html
-        console.log(html.length);
-        // Close the page we opened here (not the browser).
-        await page.close();
+        // const html = await page.$eval('html', (element) => {
+        //     return element.innerHTML;
+        // });
+        // // print length of html
+        // console.log(html.length);
+        // // Close the page we opened here (not the browser).
+        // await page.close();
+        var data = []
+        await page.waitForSelector(selector, { visible: true, hidden: true, timeout: 4000 });
+        data = await page.evaluate(() => {
+            const anchors = document.querySelectorAll("a[data-testid='post-title']");
+            var hrefs = []
+            anchors.forEach(anchor => {
+                console.log("anchor", anchor.href);
+                hrefs.push(anchor.href);
+            })
+            return hrefs
+            // if (shreddit) {
+            //     queries = shreddit.querySelectorAll("a[data-testid='post-title']");
+            //     console.log("queries", queries);
+            //     return queries
+
+            // }
+        })
+        // for (let index = 0; index < data.length; index++) {
+        //     const element = data[index].innerHTML;
+        //     console.log("element", element);
+        // }
         // await page.waitForSelector("shreddit-app", { visible: true });
         // const hrefs = await page.evaluate(() => {
         //     const walk = root => [
         //         ...[...root.querySelectorAll("shreddit-app")]
-        //         // .map(e => e.getAttribute("href")),
-        //         // ...[...root.querySelectorAll("*")]
-        //         //     .filter(e => e.shadowRoot)
-        //         //     .flatMap(e => walk(e.shadowRoot))
+        //             .map(e => e.getAttribute("href")),
+        //         ...[...root.querySelectorAll("*")]
+        //             .filter(e => e.shadowRoot)
+        //             .flatMap(e => walk(e.shadowRoot))
         //     ];
 
 
@@ -107,7 +127,7 @@ app.get('/scrape', async (req, res) => {
         await browser.close();
 
         // Send the scraped data as JSON response
-        res.json({ links: html });
+        res.json({ links: data });
     } catch (error) {
         console.error('Error scraping the page:', error);
         res.status(500).json({ error: 'Failed to scrape the page' });
@@ -119,3 +139,4 @@ app.get('/scrape', async (req, res) => {
 app.listen(port, () => {
     console.log(`Listening on http://localhost:${port}`);
 })
+
