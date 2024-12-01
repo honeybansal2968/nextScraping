@@ -1,7 +1,7 @@
 const express = require('express');
-// const puppeteer = require('puppeteer');
-const puppeteer = require('puppeteer-core');
-const chromium = require('chrome-aws-lambda');
+const puppeteer = require('puppeteer');
+// const puppeteer = require('puppeteer-core');
+// const chromium = require('chrome-aws-lambda');
 const path = require('path')
 
 const app = express();
@@ -31,14 +31,9 @@ app.get('/scrape', async (req, res) => {
         args.push('--enable-experimental-web-platform-features');
         // Launch Puppeteer browser
         const browser = await puppeteer.launch({
-            args: chromium.args,
-            executablePath: await chromium.executablePath,
-            headless: chromium.headless,
+            headless: true, // Run in headless mode (no UI)
+            args: ['--no-sandbox', '--disable-setuid-sandbox'], // Disable sandboxing (required for certain environments)
         });
-        // const browser = await puppeteer.launch({
-        //     headless: true, // Run in headless mode (no UI)
-        //     args: ['--no-sandbox', '--disable-setuid-sandbox'], // Disable sandboxing (required for certain environments)
-        // });
         const page = await browser.newPage();
         await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.5735.134 Safari/537.36');
 
