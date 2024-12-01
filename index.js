@@ -12,7 +12,7 @@ const port = parseInt(process.env.PORT) || process.argv[3] || 8090;
 //     .set('view engine', 'ejs');
 
 app.get('/', (req, res) => {
-    res.render('index');
+    res.json({ "msg": "Default world" });
 });
 
 app.get('/api', (req, res) => {
