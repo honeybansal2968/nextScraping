@@ -11,9 +11,11 @@
   "license": "ISC",
   "dependencies": {
     "@sparticuz/chromium": "^131.0.1",
+    "chrome-aws-lambda": "^10.1.0",
     "ejs": "^3.1.9",
     "express": "^4.21.1",
-    "puppeteer": "^23.9.0"
+    "puppeteer": "^23.9.0",
+    "puppeteer-core": "^23.9.0"
   },
   "devDependencies": {
     "@types/node": "^22.10.1",
